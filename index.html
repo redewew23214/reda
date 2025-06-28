@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .login-form h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .success-message {
+            color: #27ae60;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .protected-content {
+            display: none;
+        }
+        
+        .content-area {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .content-area h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .admin-panel {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .admin-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+        
+        .admin-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 로그인 폼 -->
+        <div id="loginForm" class="login-form">
+            <h1>🔐 관리자 인증</h1>
+            <div class="input-group">
+                <label for="password">비밀번호를 입력하세요:</label>
+                <input type="password" id="password" placeholder="비밀번호 입력">
+            </div>
+            <button class="login-btn" onclick="checkPassword()">로그인</button>
+            <div id="message"></div>
+        </div>
+        
+        <!-- 보호된 콘텐츠 -->
+        <div id="protectedContent" class="protected-content">
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+            <div class="content-area">
+                <h2>✅ 관리자 대시보드</h2>
+                <p>인증이 완료되었습니다! 관리자 페이지에 오신 것을 환영합니다.</p>
+                
+                <div class="admin-panel">
+                    <div class="admin-card">
+                        <h3>📊 사이트 통계</h3>
+                        <p>오늘 방문자: 127명</p>
+                        <p>총 방문자: 3,456명</p>
+                    </div>
+                    
+                    <div class="admin-card">
+                        <h3>📝 최근 활동</h3>
+                        <p>• 새로운 게시물 5개</p>
+                        <p>• 댓글 12개</p>
+                        <p>• 회원가입 3명</p>
+                    </div>
+                    
+                    <div class="admin-card">
+                        <h3>⚙️ 시스템 상태</h3>
+                        <p>서버 상태: <span style="color: #27ae60;">정상</span></p>
+                        <p>데이터베이스: <span style="color: #27ae60;">연결됨</span></p>
+                    </div>
+                    
+                    <div class="admin-card">
+                        <h3>🔧 관리 도구</h3>
+                        <p>여기에 실제 관리자 기능들을 추가할 수 있습니다.</p>
+                        <p>• 사용자 관리</p>
+                        <p>• 콘텐츠 관리</p>
+                        <p>• 설정 변경</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 비밀번호 목록 (5개)
+        const validPasswords = [
+            "admin123",
+            "manager2024", 
+            "secure789",
+            "password001",
+            "access2025"
+        ];
+        
+        function checkPassword() {
+            const inputPassword = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+            
+            // 여기에 당신의 Google Sites 주소를 입력하세요
+            const YOUR_SITE_URL = "https://sites.google.com/view/redsgame/%ED%99%88/%EA%B4%80%EB%A6%AC%EC%9E%90?authuser=1";
+            
+            if (inputPassword === '') {
+                showMessage('비밀번호를 입력해주세요.', 'error');
+                return;
+            }
+            
+            // 입력한 비밀번호가 유효한 비밀번호 목록에 있는지 확인
+            if (validPasswords.includes(inputPassword)) {
+                showMessage('인증 성공! 사이트로 이동합니다...', 'success');
+                setTimeout(() => {
+                    // 당신의 실제 사이트로 리다이렉트
+                    window.location.href = YOUR_SITE_URL;
+                }, 1500);
+            } else {
+                showMessage('잘못된 비밀번호입니다. 다시 시도해주세요.', 'error');
+                document.getElementById('password').value = '';
+            }
+        }
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+        }
+        
+        function logout() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('protectedContent').style.display = 'none';
+            document.getElementById('password').value = '';
+            document.getElementById('message').textContent = '';
+        }
+        
+        // 엔터키로 로그인
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+    </script>
+</body>
+</html>
